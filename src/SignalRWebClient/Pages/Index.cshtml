@@ -1,0 +1,37 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <input type="button" id="btnConnect" onclick="connectToServer();" value="Connect" />
+    <input type="button" id="btnDisconnect" onclick="disconnectFromServer();" value="Disconnect" />
+</div>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+
+<script type="text/javascript">
+    var connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7195/example", { skipNegotiation: true, transport: signalR.HttpTransportType.WebSockets, accessTokenFactory: () => '@Model.Token' })
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("MessageReceived", function(message) {
+        console.log(message);
+    });
+
+    function connectToServer() {
+        connection.start().then(function() {
+            console.log('conneted to server.');
+        }).catch(function (err) {
+            console.error(err.toString());
+        });
+    }
+
+    function disconnectFromServer() {
+        connection.stop();
+    }
+</script>
